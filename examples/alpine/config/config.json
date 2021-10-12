@@ -1,0 +1,8 @@
+{
+  "description": "Sample application configs",
+  "alpine": {
+    "addr": 10000,
+    "port": "24001-24075,24501-24575,24897-24999",
+    "loglevel": "debug"
+  }
+}

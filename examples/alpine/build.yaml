@@ -1,0 +1,22 @@
+packages:
+- name: "alpine"
+  release: "ThinXR_7.3.15"
+  version: "0.1.0"
+  sources:
+    - name: alpine
+      file: examples/alpine/alpine.tar.gz
+  config-dir:
+    - name: alpine-configs
+      dir: examples/alpine/config
+
+- name: "alpine"
+  release: "eXR_7.3.1"
+  version: "0.1.0"
+  sources:
+    - name: alpine
+      file: examples/alpine/alpine.tar.gz
+  config-dir:
+    - name: alpine-configs
+      dir: examples/alpine/config
+  copy_hostname: true
+  copy_ems_cert: true
