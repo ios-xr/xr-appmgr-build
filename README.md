@@ -12,7 +12,7 @@ Create an `build.yaml` file and add entries for your app
     - name: alpine # Will correspond to the source name on the router
       file: examples/alpine/swanagent.tar # Path from xr-appmgr-build root to image
   config-dir:
-    - name: SwanAgent # The name of the directory for the app to mount in its docker run opts
+    - name: alpine-configs # The name of the directory for the app to mount in its docker run opts
       dir: examples/alpine/config
   copy_hostname: true # Copy router hostname into config dir (only useful for eXR platforms)
   copy_ems_cert: true # Copy router ems certificate into config dir
