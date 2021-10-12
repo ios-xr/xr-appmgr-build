@@ -10,7 +10,7 @@ Create an `build.yaml` file and add entries for your app
   version: "0.1.0" # Application semantic version 
   sources:
     - name: alpine # Will correspond to the source name on the router
-      file: examples/alpine/swanagent.tar # Path from xr-appmgr-build root to image
+      file: examples/alpine/alpine.tar.gz # Path from xr-appmgr-build root to image
   config-dir:
     - name: alpine-configs # The name of the directory for the app to mount in its docker run opts
       dir: examples/alpine/config
