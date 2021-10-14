@@ -5,6 +5,7 @@ Scripts to build RPMs for use with the XR appmgr.
 
 Create an `build.yaml` file and add entries for your app
 ```
+packages:
 - name: "alpine"
   release: "ThinXR_7.3.15" # Release should correspond to a file in release_configs dir
   version: "0.1.0" # Application semantic version 
