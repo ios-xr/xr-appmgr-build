@@ -280,7 +280,6 @@ for package in config["packages"]:
         [
             "docker",
             "run",
-            "-it",
             "--rm",
             "--name",
             "appmgr_rpm_builder",
