@@ -283,6 +283,9 @@ for package in config["packages"]:
 
     print("Building RPM...")
     print(" ".join(command))
+
+    os.makedirs(RPM_DIR, exist_ok=True)
+
     subprocess.run(
         [
             "docker",
@@ -296,7 +299,7 @@ for package in config["packages"]:
             "{}:{}".format(os.path.abspath(RPM_SOURCE_DIR), release_conf["build"]["rpm_source_dir"]),
             "-v",
             "{}:{}".format(
-                os.path.join(os.path.abspath(dirname), "RPMS"), release_conf["build"]["rpm_output_dir"]
+                os.path.abspath(RPM_DIR), release_conf["build"]["rpm_output_dir"]
             ),
             # This one's for logs
             "-v",
