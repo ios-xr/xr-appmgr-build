@@ -83,6 +83,7 @@ def make_spec(package):
     prep = []
     install = []
     files = []
+    pre = []
     post = []
     preun = []
 
@@ -115,6 +116,10 @@ def make_spec(package):
     prep.append("%prep")
     prep.append("%setup -q -n {}".format(package_name))
     prep.append("")
+
+    # init pre section
+    pre.append("")
+    pre.append("%pre")
 
     # init post section
     post.append("")
@@ -150,6 +155,7 @@ def make_spec(package):
                 os.path.join("sources", source["name"]), source_dest
             )
         )
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(os.path.join(source_dest, source["name"])))
 
     install.append("")
     install.append("# Config directory")
@@ -161,6 +167,7 @@ def make_spec(package):
             release_conf["paths"]["appmgr_config"],
             dir["name"],
         )
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(conf_dest))
         install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
         files.append("%dir {}".format(conf_dest))
         install.append(
@@ -188,7 +195,7 @@ def make_spec(package):
             preun.append("rm {}".format(os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")))
 
     if release_conf["build"].getboolean("script_support"):
-        sections = itertools.chain(headers, prep, install, files, post, preun)
+        sections = itertools.chain(headers, prep, install, files, pre, post, preun)
     else:
         sections = itertools.chain(headers, prep, install, files)
 
