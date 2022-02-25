@@ -157,6 +157,9 @@ def make_spec(package):
         )
         pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(os.path.join(source_dest, source["name"])))
 
+    def normjoin(path, *args):
+        return os.path.normpath(os.path.join(path, *args))
+
     install.append("")
     install.append("# Config directory")
     for dir in package.get("config-dir", []):
@@ -174,9 +177,6 @@ def make_spec(package):
             "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
         )
 
-        def normjoin(path, *args):
-            return os.path.normpath(os.path.join(path, *args))
-
         prefix = pkg_config_dir(package_name, dir["name"])
         for root, subdirs, subfiles in os.walk(prefix):
             # Make path relative to pkg_conf_dir
@@ -193,6 +193,32 @@ def make_spec(package):
         if package.get("copy_hostname"):
             post.append("cp /etc/hostname $RPM_INSTALL_PREFIX{}".format(conf_dest))
             preun.append("rm {}".format(os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")))
+
+    install.append("")
+    install.append("# Data directory")
+    for dir in package.get("data-dir", []):
+        # Directory to copy
+        data_dir = os.path.join("data", dir["name"])
+        # Destination directory
+        data_dest = os.path.join(
+            release_conf["paths"]["appmgr_data"],
+            dir["name"],
+        )
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(data_dest))
+        install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
+        files.append("%dir {}".format(data_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(data_dir, data_dest)
+        )
+
+        prefix = pkg_data_dir(package_name, dir["name"])
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_data_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(data_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(data_dest, root, name)))
 
     if release_conf["build"].getboolean("script_support"):
         sections = itertools.chain(headers, prep, install, files, pre, post, preun)

@@ -8,6 +8,9 @@ packages:
   config-dir:
     - name: alpine-configs
       dir: examples/alpine/config
+  data-dir:
+    - name: alpine-data
+      dir: examples/alpine/data
 
 - name: "alpine"
   release: "eXR_7.3.1"
@@ -18,5 +21,8 @@ packages:
   config-dir:
     - name: alpine-configs
       dir: examples/alpine/config
+  data-dir:
+    - name: alpine-data
+      dir: examples/alpine/data
   copy_hostname: true
   copy_ems_cert: true
