@@ -188,11 +188,11 @@ def make_spec(package):
 
         if package.get("copy_ems_cert"):
             post.append("cp /misc/config/grpc/ems.pem $RPM_INSTALL_PREFIX{}".format(conf_dest))
-            preun.append("rm {}".format(os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "ems.pem")))
+            preun.append("rm -rf {}".format(os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "ems.pem")))
 
         if package.get("copy_hostname"):
             post.append("cp /etc/hostname $RPM_INSTALL_PREFIX{}".format(conf_dest))
-            preun.append("rm {}".format(os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")))
+            preun.append("rm -rf {}".format(os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")))
 
     install.append("")
     install.append("# Data directory")
