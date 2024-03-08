@@ -8,6 +8,8 @@ packages:
     - file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
     - dir: examples/alpine/config #Do not change
+  data-dir:
+    - dir: examples/alpine/data #Do not change
 
 - name: "alpine" #Can be changed
   release: "eXR_7.3.1" #Do not change
@@ -17,6 +19,8 @@ packages:
     - file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
     - dir: examples/alpine/config #Do not change
+  data-dir:
+    - dir: examples/alpine/data #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
@@ -28,6 +32,8 @@ packages:
     - file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
     - dir: examples/alpine/config #Do not change
+  data-dir:
+    - dir: examples/alpine/data #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
@@ -40,6 +46,8 @@ packages:
     - file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
     - dir: examples/alpine/config #Do not change
+  data-dir:
+    - dir: examples/alpine/data #Do not change
   copy_hostname: true
   copy_ems_cert: true
 

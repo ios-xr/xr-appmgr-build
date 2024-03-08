@@ -11,12 +11,12 @@ packages:
   target-release: "ThinXR_7.3.15" # Target release if present, RPM name will have this target-release name, else will have above release name (Editable)
   version: "0.1.0" # Application semantic version (Editable)
   sources:
-    - name: alpine # Will correspond to the source name on the router (Editable)
       file: examples/alpine/alpine.tar.gz # Path from xr-appmgr-build root to image (Editable)
             # Tar file  must be built with "--platform=linux/x86_64" option specified during docker build
   config-dir:
-    - name: alpine # The name of the directory for the app to mount in its docker run opts (Editable)
       dir: examples/alpine/config #Not editable
+  data-dir:
+      dir: examples/alpine/data #Not editable
   copy_hostname: true # Copy router hostname into config dir (only useful for eXR platforms)
   copy_ems_cert: true # Copy router ems certificate into config dir
 ```
@@ -30,9 +30,12 @@ Create a `build.yaml` file and add entries for your app
   version: "3.14" #Editable
   partner-name: "radware" # Needed only for Partner rpms (Editable)
   sources:
-    - name: alpine # Name should match source tar file (Editable)
       file: examples/alpine/alpine.tar.gz # File must have "tar.gz" extension (Editable)
             # Tar file must be built with "--platform=linux/x86_64" option specified during docker build
+  config-dir:
+      dir: examples/alpine/config #Not editable
+  data-dir:
+      dir: examples/alpine/data #Not editable
 ```
 Build:
 `./appmgr_build -b examples/alpine/build.yaml`
