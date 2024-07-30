@@ -175,14 +175,16 @@ def make_owner_rpm_spec(package, pre, post, preun, install, files):
 
     install.append("")
     install.append("# Data directory")
-    for dir in package.get("data-dir", []):
-        # Directory to copy
-        data_dir = os.path.join("data", dir["name"])
+    data_list = package.get("data-dir")
+    if data_list:
+        data_name = data_list[0]["name"]
         # Destination directory
         data_dest = os.path.join(
-            release_conf["paths"]["appmgr_data"],
-            dir["name"],
+            release_conf["paths"]["appmgr_source"], "owner",
+            data_name, "data"
         )
+        # Directory to copy
+        data_dir = os.path.join("data", data_name)
         pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(data_dest))
         install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
         files.append("%dir {}".format(data_dest))
@@ -190,7 +192,7 @@ def make_owner_rpm_spec(package, pre, post, preun, install, files):
             "cp -arT {} %{{buildroot}}{}".format(data_dir, data_dest)
         )
 
-        prefix = pkg_data_dir(package_name, dir["name"])
+        prefix = pkg_data_dir(package_name, data_name)
         for root, subdirs, subfiles in os.walk(prefix):
             # Make path relative to pkg_data_dir
             root = os.path.relpath(root, start=prefix)
@@ -276,13 +278,13 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
     data_list = package.get("data-dir")
     if data_list:
         data_name = data_list[0]["name"]
-        # Directory to copy
-        data_dir = os.path.join("data", data_name)
         # Destination directory
         data_dest = os.path.join(
-            release_conf["paths"]["appmgr_data"],
-            data_name,
+            release_conf["paths"]["appmgr_source"], "partner",
+            data_name, "data"
         )
+        # Directory to copy
+        data_dir = os.path.join("data", data_name)
         pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(data_dest))
         install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
         files.append("%dir {}".format(data_dest))
@@ -462,7 +464,7 @@ def make_spec(package):
         package_name = "{name}-{version}-{target-release}".format(**package)
         headers.append("Release: {}".format(package["target-release"]))
     else:
-        package_name = "{name}-{version}-{release}".format(**package)
+        package_name = "{name}-{version}".format(**package)
         headers.append("Release: {}".format(package["release"]))
     # TODO: is this ok?
     headers.append(
@@ -777,7 +779,7 @@ for package in config["packages"]:
     if 'target-release' in package:
         package_name = "{name}-{version}-{target-release}".format(**package)
     else:
-        package_name = "{name}-{version}-{release}".format(**package)
+        package_name = "{name}-{version}".format(**package)
     print(" --->", package["name"])
     if package["name"].startswith('partner-'):
         add_partner_rpm_files(package, package_name)
@@ -809,7 +811,7 @@ for package in config["packages"]:
     if 'target-release' in package:
         spec_name = "{name}-{version}-{target-release}.spec".format(**package)
     else:
-        spec_name = "{name}-{version}-{release}.spec".format(**package)
+        spec_name = "{name}-{version}.spec".format(**package)
     print("Generating spec file:", spec_name)
     spec = make_spec(package)
     with open(os.path.join(SPEC_DIR, spec_name), "w") as f:
