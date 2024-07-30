@@ -102,243 +102,348 @@ def normjoin(path, *args):
     return os.path.normpath(os.path.join(path, *args))
 
 def make_owner_rpm_spec(package, pre, post, preun, install, files):
+    install.append("# Sources")
     source_dest = os.path.join(release_conf["paths"]["appmgr_source"], "owner")
-    source_name = package.get("sources")
     install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
-    files.append("%defattr(-,root,root)")
-    files.append("{}".format(os.path.join(source_dest, package["name"][len('owner-'):])))
-    files.append(
-        "%dir {}".format(os.path.join(source_dest, package["name"][len('owner-'):]))
-    )
-    files.append(
-        os.path.join(
-            source_dest, package["name"][len('owner-'):], os.path.basename(source_name[0]["file"])
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        files.append("%defattr(-,root,root)")
+        files.append("{}".format(os.path.join(source_dest, source_name)))
+        files.append(
+            "%dir {}".format(os.path.join(source_dest, source_name))
         )
-    )
-    install.append(
-        "cp -ar {} %{{buildroot}}{}".format(
-            os.path.join("sources", package["name"][len('owner-'):]), source_dest
+        files.append(
+            os.path.join(
+                source_dest, source_name, os.path.basename(source_list[0]["file"])
+            )
         )
-    )
-    pre.append(
-        "rm -rf $RPM_INSTALL_PREFIX{}".format(
-            os.path.join(source_dest, package["name"][len('owner-'):])
+        install.append(
+            "cp -ar {} %{{buildroot}}{}".format(
+                os.path.join("sources", source_name), source_dest
+            )
         )
-    )
+        pre.append(
+            "rm -rf $RPM_INSTALL_PREFIX{}".format(
+                os.path.join(source_dest, source_name)
+            )
+        )
+
     install.append("")
     install.append("# Config directory")
-    conf_dest = os.path.join(release_conf["paths"]["appmgr_source"], "owner", package["name"][len('owner-'):],"config")
-    conf_dir = os.path.join("configs", package["name"][len('owner-'):])
-    install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
-    files.append("%dir {}".format(conf_dest))
-    install.append(
-        "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
-    )
-
-    prefix = pkg_config_dir(package_name, package["name"][len('owner-'):])
-    for root, subdirs, subfiles in os.walk(prefix):
-        # Make path relative to pkg_conf_dir
-        root = os.path.relpath(root, start=prefix)
-        for name in subdirs:
-            files.append("%dir {}".format(normjoin(conf_dest, root, name)))
-        for name in subfiles:
-            files.append("{}".format(normjoin(conf_dest, root, name)))
-
-    if package.get("copy_ems_cert"):
-        post.append(
-            "cp /misc/config/grpc/ems.pem $RPM_INSTALL_PREFIX{}".format(
-                conf_dest
-            )
-        )
-        preun.append(
-            "rm -rf {}".format(
-                os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "ems.pem")
-            )
+    config_list = package.get("config-dir")
+    if config_list:
+        config_name = config_list[0]["name"]
+        conf_dest = os.path.join(release_conf["paths"]["appmgr_source"], "owner", config_name, "config")
+        conf_dir = os.path.join("configs", config_name)
+        install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
+        files.append("%dir {}".format(conf_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
         )
 
-    if package.get("copy_hostname"):
-        post.append(
-            "cp /etc/hostname $RPM_INSTALL_PREFIX{}".format(conf_dest)
-        )
-        preun.append(
-            "rm -rf {}".format(
-                os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")
+        prefix = pkg_config_dir(package_name, config_name)
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_conf_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(conf_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(conf_dest, root, name)))
+
+        if package.get("copy_ems_cert"):
+            post.append(
+                "cp /misc/config/grpc/ems.pem $RPM_INSTALL_PREFIX{}".format(
+                    conf_dest
+                )
             )
+            preun.append(
+                "rm -rf {}".format(
+                    os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "ems.pem")
+                )
+            )
+
+        if package.get("copy_hostname"):
+            post.append(
+                "cp /etc/hostname $RPM_INSTALL_PREFIX{}".format(conf_dest)
+            )
+            preun.append(
+                "rm -rf {}".format(
+                    os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")
+                )
+            )
+
+    install.append("")
+    install.append("# Data directory")
+    for dir in package.get("data-dir", []):
+        # Directory to copy
+        data_dir = os.path.join("data", dir["name"])
+        # Destination directory
+        data_dest = os.path.join(
+            release_conf["paths"]["appmgr_data"],
+            dir["name"],
         )
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(data_dest))
+        install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
+        files.append("%dir {}".format(data_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(data_dir, data_dest)
+        )
+
+        prefix = pkg_data_dir(package_name, dir["name"])
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_data_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(data_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(data_dest, root, name)))
 
 def make_partner_rpm_spec(package, pre, post, preun, install, files):
+    install.append("# Sources")
     source_dest = os.path.join(release_conf["paths"]["appmgr_source"], "partner", package["partner-name"])
-    source_name = package.get("sources")
-    install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
-    files.append("%defattr(-,root,root)")
-    files.append(source_dest)
-    files.append(
-        "%dir {}".format(os.path.join(source_dest, package["name"][len('partner-'):]))
-    )
-    files.append(
-        os.path.join(
-            source_dest, package["name"][len('partner-'):], os.path.basename(source_name[0]["file"])
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
+        files.append("%defattr(-,root,root)")
+        files.append(source_dest)
+        files.append(
+            "%dir {}".format(os.path.join(source_dest, source_name))
         )
-    )
-    install.append(
-        "cp -ar {} %{{buildroot}}{}".format(
-            os.path.join("sources", package["name"][len('partner-'):]), source_dest
+        files.append(
+            os.path.join(
+                source_dest, source_name, os.path.basename(source_list[0]["file"])
+            )
         )
-    )
-    pre.append(
-        "rm -rf $RPM_INSTALL_PREFIX{}".format(
-            os.path.join(source_dest, package["name"][len('partner-'):])
+        install.append(
+            "cp -ar {} %{{buildroot}}{}".format(
+                os.path.join("sources", source_name), source_dest
+            )
         )
-    )
+        pre.append(
+            "rm -rf $RPM_INSTALL_PREFIX{}".format(
+                os.path.join(source_dest, source_name)
+            )
+        )
+
     install.append("")
     install.append("# Config directory")
-    conf_dest = os.path.join(release_conf["paths"]["appmgr_source"], "partner", package["partner-name"], package["name"][len('partner-'):],"config")
-    conf_dir = os.path.join("configs", package["name"][len('partner-'):])
-    install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
-    files.append("%dir {}".format(conf_dest))
-    install.append(
-        "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
-    )
-
-    prefix = pkg_config_dir(package_name, package["name"][len('partner-'):])
-    for root, subdirs, subfiles in os.walk(prefix):
-        # Make path relative to pkg_conf_dir
-        root = os.path.relpath(root, start=prefix)
-        for name in subdirs:
-            files.append("%dir {}".format(normjoin(conf_dest, root, name)))
-        for name in subfiles:
-            files.append("{}".format(normjoin(conf_dest, root, name)))
-
-    if package.get("copy_ems_cert"):
-        post.append(
-            "cp /misc/config/grpc/ems.pem $RPM_INSTALL_PREFIX{}".format(
-                conf_dest
-            )
-        )
-        preun.append(
-            "rm -rf {}".format(
-                os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "ems.pem")
-            )
+    config_list = package.get("config-dir")
+    if config_list:
+        config_name = config_list[0]["name"]
+        conf_dest = os.path.join(release_conf["paths"]["appmgr_source"], "partner", package["partner-name"], config_name,"config")
+        conf_dir = os.path.join("configs", config_name)
+        install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
+        files.append("%dir {}".format(conf_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
         )
 
-    if package.get("copy_hostname"):
-        post.append(
-            "cp /etc/hostname $RPM_INSTALL_PREFIX{}".format(conf_dest)
-        )
-        preun.append(
-            "rm -rf {}".format(
-                os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")
+        prefix = pkg_config_dir(package_name, config_name)
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_conf_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(conf_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(conf_dest, root, name)))
+
+        if package.get("copy_ems_cert"):
+            post.append(
+                "cp /misc/config/grpc/ems.pem $RPM_INSTALL_PREFIX{}".format(
+                    conf_dest
+                )
             )
+            preun.append(
+                "rm -rf {}".format(
+                    os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "ems.pem")
+                )
+            )
+
+        if package.get("copy_hostname"):
+            post.append(
+                "cp /etc/hostname $RPM_INSTALL_PREFIX{}".format(conf_dest)
+            )
+            preun.append(
+                "rm -rf {}".format(
+                    os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")
+                )
+            )
+
+    install.append("")
+    install.append("# Data directory")
+    data_list = package.get("data-dir")
+    if data_list:
+        data_name = data_list[0]["name"]
+        # Directory to copy
+        data_dir = os.path.join("data", data_name)
+        # Destination directory
+        data_dest = os.path.join(
+            release_conf["paths"]["appmgr_data"],
+            data_name,
         )
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(data_dest))
+        install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
+        files.append("%dir {}".format(data_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(data_dir, data_dest)
+        )
+        prefix = pkg_data_dir(package_name, data_name)
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_data_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(data_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(data_dest, root, name)))
 
 def make_native_rpm_spec(package, pre, post, preun, install, files):
+    install.append("# Sources")
     source_dest = release_conf["paths"]["appmgr_source"]
     install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
-    source_name = package.get("sources")
-    files.append(
-        "%dir {}".format(os.path.join(source_dest, package["name"]))
-    )
-    files.append(
-        os.path.join(
-            source_dest, package["name"], os.path.basename(source_name[0]["file"])
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        files.append(
+            "%dir {}".format(os.path.join(source_dest, source_name))
         )
-    )
-    install.append(
-        "cp -ar {} %{{buildroot}}{}".format(
-            os.path.join("sources", package["name"]), source_dest
+        files.append(
+            os.path.join(
+                source_dest, source_name, os.path.basename(source_list[0]["file"])
+            )
         )
-    )
-    pre.append(
-        "rm -rf $RPM_INSTALL_PREFIX{}".format(
-            os.path.join(source_dest, package["name"])
+        install.append(
+            "cp -ar {} %{{buildroot}}{}".format(
+                os.path.join("sources", source_name), source_dest
+            )
         )
-    )
+        pre.append(
+            "rm -rf $RPM_INSTALL_PREFIX{}".format(
+                os.path.join(source_dest, source_name)
+            )
+        )
+
     install.append("")
     install.append("# Config directory")
-    conf_dest = os.path.join(release_conf["paths"]["appmgr_config"],package["name"])
+    config_list = package.get("config-dir")
+    if config_list:
+        config_name = config_list[0]["name"]
+        conf_dest = os.path.join(release_conf["paths"]["appmgr_config"],config_name)
 
-    conf_dir = os.path.join("configs", package["name"])
-    pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(conf_dest))
-    install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
-    files.append("%dir {}".format(conf_dest))
-    install.append(
-        "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
-    )
+        conf_dir = os.path.join("configs", config_name)
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(conf_dest))
+        install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
+        files.append("%dir {}".format(conf_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
+        )
 
-    prefix = pkg_config_dir(package_name, package["name"])
-    for root, subdirs, subfiles in os.walk(prefix):
-        # Make path relative to pkg_conf_dir
-        root = os.path.relpath(root, start=prefix)
-        for name in subdirs:
-            files.append("%dir {}".format(normjoin(conf_dest, root, name)))
-        for name in subfiles:
-            files.append("{}".format(normjoin(conf_dest, root, name)))
+        prefix = pkg_config_dir(package_name, config_name)
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_conf_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(conf_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(conf_dest, root, name)))
 
-    if package.get("copy_ems_cert"):
-        post.append(
-            "cp /misc/config/grpc/ems.pem $RPM_INSTALL_PREFIX{}".format(
-                conf_dest
+        if package.get("copy_ems_cert"):
+            post.append(
+                "cp /misc/config/grpc/ems.pem $RPM_INSTALL_PREFIX{}".format(
+                    conf_dest
+                )
             )
-        )
-        preun.append(
-            "rm -rf {}".format(
-                os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "ems.pem")
+            preun.append(
+                "rm -rf {}".format(
+                    os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "ems.pem")
+                )
             )
+
+        if package.get("copy_hostname"):
+            post.append(
+                "cp /etc/hostname $RPM_INSTALL_PREFIX{}".format(conf_dest)
+            )
+            preun.append(
+                "rm -rf {}".format(
+                    os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")
+                )
+            )
+
+    install.append("")
+    install.append("# Data directory")
+    data_list = package.get("data-dir")
+    if data_list:
+        data_name = data_list[0]["name"]
+        # Directory to copy
+        data_dir = os.path.join("data", data_name)
+        # Destination directory
+        data_dest = os.path.join(
+            release_conf["paths"]["appmgr_data"],
+            data_name,
+        )
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(data_dest))
+        install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
+        files.append("%dir {}".format(data_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(data_dir, data_dest)
         )
 
-    if package.get("copy_hostname"):
-        post.append(
-            "cp /etc/hostname $RPM_INSTALL_PREFIX{}".format(conf_dest)
-        )
-        preun.append(
-            "rm -rf {}".format(
-                os.path.join("$RPM_INSTALL_PREFIX" + conf_dest, "hostname")
-            )
-        )
+        prefix = pkg_data_dir(package_name, data_name)
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_data_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(data_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(data_dest, root, name)))
 
 def make_pscript_rpm_spec(package, pre, post, preun, install, files):
+    install.append("# Sources")
     source_dest = os.path.join(release_conf["paths"]["appmgr_source"], "exec")
-    install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
-    files.append("%defattr(-,root,root)")
-    files.append(source_dest)
-    files.append(
-        "%dir {}".format(os.path.join(source_dest, package["name"]))
-    )
-    install.append(
-        "cp -ar {} %{{buildroot}}{}".format(
-            os.path.join("sources", package["name"]), source_dest
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
+        files.append("%defattr(-,root,root)")
+        files.append(source_dest)
+        files.append(
+            "%dir {}".format(os.path.join(source_dest, source_name))
         )
-    )
-    pre.append(
-        "rm -rf $RPM_INSTALL_PREFIX{}".format(
-            os.path.join(source_dest, package["name"])
+        install.append(
+            "cp -ar {} %{{buildroot}}{}".format(
+                os.path.join("sources", source_name), source_dest
+            )
         )
-    )
-    install.append("")
-    install.append("# Config directory")
+        pre.append(
+            "rm -rf $RPM_INSTALL_PREFIX{}".format(
+                os.path.join(source_dest, source_name)
+            )
+        )
 
 
 def make_ownerpscript_rpm_spec(package, pre, post, preun, install, files):
+    install.append("# Sources")
     source_dest = os.path.join(release_conf["paths"]["appmgr_source"], "exec")
-    install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
-    files.append("%defattr(-,root,root)")
-    files.append(source_dest)
-    files.append(
-        "%dir {}".format(os.path.join(source_dest, package["name"]))
-    )
-    install.append(
-        "cp -ar {} %{{buildroot}}{}".format(
-            os.path.join("sources", package["name"]), source_dest
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
+        files.append("%defattr(-,root,root)")
+        files.append(source_dest)
+        files.append(
+            "%dir {}".format(os.path.join(source_dest, source_name))
         )
-    )
-    pre.append(
-        "rm -rf $RPM_INSTALL_PREFIX{}".format(
-            os.path.join(source_dest, package["name"])
+        install.append(
+            "cp -ar {} %{{buildroot}}{}".format(
+                os.path.join("sources", source_name), source_dest
+            )
         )
-    )
-    install.append("")
-    install.append("# Config directory")
-
+        pre.append(
+            "rm -rf $RPM_INSTALL_PREFIX{}".format(
+                os.path.join(source_dest, source_name)
+            )
+        )
 
 def make_spec(package):
     # Seperate out by section
@@ -413,7 +518,6 @@ def make_spec(package):
     files.append("")
     files.append("%files")
 
-    install.append("# Sources")
 
     if package["name"].startswith('owner-pscript'):
         make_ownerpscript_rpm_spec(package, pre, post, preun, install, files)
@@ -460,30 +564,34 @@ def add_partner_rpm_files(package, package_name):
         sys.exit(1)
 
     print("Adding sources...")
-    dest = pkg_source_dir(package_name, package["name"][len('partner-'):])
-    os.makedirs(dest, exist_ok=False)
-    source_name = package.get("sources")
-    if source_name:
-        if os.path.basename(source_name[0]["file"])[:-7] != package["name"][len('partner-'):] :
-            print("Tar file name should match package name, omitting:", package["name"])
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        print(" --->", source_name)
+        if os.path.basename(source_list[0]["file"])[:-7] != source_name :
+            print("Tar file name should match sources name, omitting:", source_name)
             sys.exit(1)
-        shutil.copy(source_name[0]["file"], dest)
+        dest = pkg_source_dir(package_name, source_name)
+        os.makedirs(dest, exist_ok=False)
+        shutil.copy(source_list[0]["file"], dest)
 
     print("Adding configs...")
     os.makedirs(pkg_config_dir(package_name), exist_ok=False)
-    print(" --->", package["name"])
-    dest = pkg_config_dir(package_name, package["name"][len('partner-'):])
-    config_name = package.get("config-dir", [])
-    if config_name:
-        shutil.copytree(config_name[0]["dir"], dest)
+    config_list = package.get("config-dir")
+    if config_list:
+        config_name = config_list[0]["name"]
+        print(" --->", config_name)
+        dest = pkg_config_dir(package_name, config_name)
+        shutil.copytree(config_list[0]["dir"], dest)
 
     print("Adding data...")
     os.makedirs(pkg_data_dir(package_name), exist_ok=False)
-    print(" --->", package["name"])
-    dest = pkg_data_dir(package_name, package["name"][len('partner-'):])
-    data_name = package.get("data-dir")
-    if data_name:
-        shutil.copytree(data_name[0]["dir"], dest)
+    data_list = package.get("data-dir")
+    if data_list:
+        data_name = data_list[0]["name"]
+        print(" --->", data_name)
+        dest = pkg_data_dir(package_name, data_name)
+        shutil.copytree(data_list[0]["dir"], dest)
 
 def add_owner_rpm_files(package, package_name):
     rpm_type = package["name"]
@@ -504,30 +612,35 @@ def add_owner_rpm_files(package, package_name):
         sys.exit(1)
 
     print("Adding sources...")
-    dest = pkg_source_dir(package_name, package["name"][len('owner-'):])
-    os.makedirs(dest, exist_ok=False)
-    source_name = package.get("sources")
-    if source_name:
-        if os.path.basename(source_name[0]["file"])[:-7] != package["name"][len('owner-'):] :
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        print(" --->", source_name)
+        if os.path.basename(source_list[0]["file"])[:-7] != package["name"][len('owner-'):] :
             print("Tar file name should match package name, omitting:", package["name"])
             sys.exit(1)
-        shutil.copy(source_name[0]["file"], dest)
+        dest = pkg_source_dir(package_name, source_name)
+        os.makedirs(dest, exist_ok=False)
+        shutil.copy(source_list[0]["file"], dest)
 
     print("Adding configs...")
     os.makedirs(pkg_config_dir(package_name), exist_ok=False)
-    print(" --->", package["name"])
-    dest = pkg_config_dir(package_name, package["name"][len('owner-'):])
-    config_name = package.get("config-dir", [])
-    if config_name:
-        shutil.copytree(config_name[0]["dir"], dest)
+    config_list = package.get("config-dir")
+    if config_list:
+        config_name = config_list[0]["name"]
+        print(" --->", config_name)
+        dest = pkg_config_dir(package_name, config_name)
+        shutil.copytree(config_list[0]["dir"], dest)
 
     print("Adding data...")
     os.makedirs(pkg_data_dir(package_name), exist_ok=False)
     print(" --->", package["name"])
-    dest = pkg_data_dir(package_name, package["name"][len('owner-'):])
-    data_name = package.get("data-dir")
-    if data_name:
-        shutil.copytree(data_name[0]["dir"], dest)
+    data_list = package.get("data-dir")
+    if data_list:
+        data_name = data_list[0]["name"]
+        print(" --->", data_name)
+        dest = pkg_data_dir(package_name, data_name)
+        shutil.copytree(data_list[0]["dir"], dest)
 
 def add_native_rpm_files(package, package_name):
     rpm_type = package["release"]
@@ -548,30 +661,34 @@ def add_native_rpm_files(package, package_name):
         sys.exit(1)
 
     print("Adding sources...")
-    dest = pkg_source_dir(package_name, package["name"])
-    os.makedirs(dest, exist_ok=False)
-    source_name = package.get("sources")
-    if source_name:
-        if os.path.basename(source_name[0]["file"])[:-7] != package["name"] :
-            print("Tar file name should match source name, omitting:", package["name"])
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"] 
+        print(" --->", source_name)
+        if os.path.basename(source_list[0]["file"])[:-7] != source_name :
+            print("Tar file name should match source name, omitting:", source_name)
             sys.exit(1)
-        shutil.copy(source_name[0]["file"], dest)
+        dest = pkg_source_dir(package_name, source_name)
+        os.makedirs(dest, exist_ok=False)
+        shutil.copy(source_list[0]["file"], dest)
 
     print("Adding configs...")
     os.makedirs(pkg_config_dir(package_name), exist_ok=False)
-    print(" --->", package["name"])
-    dest = pkg_config_dir(package_name, package["name"])
-    config_name = package.get("config-dir", [])
-    if config_name:
-        shutil.copytree(config_name[0]["dir"], dest)
+    config_list = package.get("config-dir", [])
+    if config_list:
+        config_name = config_list[0]["name"]
+        print(" --->", config_name)
+        dest = pkg_config_dir(package_name, config_name)
+        shutil.copytree(config_list[0]["dir"], dest)
 
     print("Adding data...")
     os.makedirs(pkg_data_dir(package_name), exist_ok=False)
-    print(" --->", package["name"])
-    dest = pkg_data_dir(package_name, package["name"])
-    data_name = package.get("data-dir")
-    if data_name:
-        shutil.copytree(data_name[0]["dir"], dest)
+    data_list = package.get("data-dir", [])
+    if data_list:
+        data_name = data_list[0]["name"]
+        print(" --->", data_name)
+        dest = pkg_data_dir(package_name, data_name)
+        shutil.copytree(data_list[0]["dir"], dest)
 
 def add_pscript_rpm_files(package, package_name):
     release_conf.read(
@@ -591,18 +708,20 @@ def add_pscript_rpm_files(package, package_name):
         sys.exit(1)
 
     print("Adding sources...")
-    dest = pkg_source_dir(package_name, package["name"])
-    source_name = package.get("sources")
-    os.makedirs(dest, exist_ok=False)
-    shutil.rmtree(dest, ignore_errors=True)
-    if source_name:
-        if not os.listdir(source_name[0]["dir"]):
-            print("The pscript directory should not be empty ", source_name[0]["dir"])
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        print(" --->", source_name)
+        dest = pkg_source_dir(package_name, source_name)
+        os.makedirs(dest, exist_ok=False)
+        shutil.rmtree(dest, ignore_errors=True)
+        if not os.listdir(source_list[0]["dir"]):
+            print("The pscript directory should not be empty ", source_list[0]["dir"])
             sys.exit(1)
-        elif len(os.listdir(source_name[0]["dir"])) == 1 and os.path.isfile(os.path.join(source_name[0]["dir"] + "/.gitignore")):
-            print("Please add files to be added to pscript directory ", source_name[0]["dir"])
+        elif len(os.listdir(source_list[0]["dir"])) == 1 and os.path.isfile(os.path.join(source_list[0]["dir"] + "/.gitignore")):
+            print("Please add files to be added to pscript directory ", source_list[0]["dir"])
             sys.exit(1)
-        shutil.copytree(source_name[0]["dir"], dest)
+        shutil.copytree(source_list[0]["dir"], dest)
 
 def add_ownerpscript_rpm_files(package, package_name):
     release_conf.read(
@@ -622,18 +741,20 @@ def add_ownerpscript_rpm_files(package, package_name):
         sys.exit(1)
 
     print("Adding sources...")
-    dest = pkg_source_dir(package_name, package["name"])
-    source_name = package.get("sources")
-    os.makedirs(dest, exist_ok=False)
-    shutil.rmtree(dest, ignore_errors=True)
-    if source_name:
-        if not os.listdir(source_name[0]["dir"]):
-            print("The pscript directory should not be empty ", source_name[0]["dir"])
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        print(" --->", source_name)
+        dest = pkg_source_dir(package_name, source_name)
+        os.makedirs(dest, exist_ok=False)
+        shutil.rmtree(dest, ignore_errors=True)
+        if not os.listdir(source_list[0]["dir"]):
+            print("The pscript directory should not be empty ", source_list[0]["dir"])
             sys.exit(1)
-        elif len(os.listdir(source_name[0]["dir"])) == 1 and os.path.isfile(os.path.join(source_name[0]["dir"] + "/.gitignore")):
-            print("Please add files to be added to pscript directory ", source_name[0]["dir"])
+        elif len(os.listdir(source_list[0]["dir"])) == 1 and os.path.isfile(os.path.join(source_list[0]["dir"] + "/.gitignore")):
+            print("Please add files to be added to pscript directory ", source_list[0]["dir"])
             sys.exit(1)
-        shutil.copytree(source_name[0]["dir"], dest)
+        shutil.copytree(source_list[0]["dir"], dest)
 
 os.makedirs(SPEC_DIR, exist_ok=True)
 os.makedirs(RPM_SOURCE_DIR, exist_ok=True)
