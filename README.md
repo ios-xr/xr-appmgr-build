@@ -33,11 +33,14 @@ Create a `build.yaml` file and add entries for your app
   version: "3.14" #Editable
   partner-name: "radware" # Needed only for Partner rpms (Editable)
   sources:
+      name: alpine #This has to be same as tar.gz file name below
       file: examples/alpine/alpine.tar.gz # File must have "tar.gz" extension (Editable)
             # Tar file must be built with "--platform=linux/x86_64" option specified during docker build
   config-dir:
+      name: alpine #This has to be same as config's parent directory name below
       dir: examples/alpine/config #Not editable
   data-dir:
+      name: alpine #This has to be same as data's parent directory name below
       dir: examples/alpine/data #Not editable
 ```
 Build:
