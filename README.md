@@ -54,6 +54,7 @@ appmgr package uninstall package alpine-0.1.0-eXR_7.3.1.x86_64
 
 # Building an RPM to be installed using XR install cli workflow
 (Scriplets are not supported using this install method)
+
 Create a `build.yaml` file and add entries for your app
 ```
 - name: "partner-alpine" # Prefix "owner-" or "partner-" for TPA apps (Prefix not editable)
@@ -169,7 +170,7 @@ We can optionally pass comma separated package name(s) in build command with -p 
 If we don't pass -p option, it will build for all the packages in build.yaml file.
 ```
 
-# Building a owner-process-script RPM to be installed using XR cli workflow
+# Building an owner-process-script RPM to be installed using XR cli workflow
 Create a `build.yaml` file and add entries for your app
 ```
 - name: "owner-pscript" #This should not be changed (Not editable)
