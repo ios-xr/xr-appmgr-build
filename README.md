@@ -52,7 +52,7 @@ appmgr package uninstall package alpine-0.1.0-eXR_7.3.1.x86_64
 ```
 
 
-# Building an RPM to be installed using XR install cli workflow
+# Building an RPM to be installed using XR install cli workflow(LNT platform only)
 (Scriplets are not supported using this install method)
 
 Create a `build.yaml` file and add entries for your app
@@ -72,7 +72,16 @@ Create a `build.yaml` file and add entries for your app
   data-dir:
       name: alpine #This has to be same as data's parent directory name below
       dir: examples/alpine/data #Not editable
+  service-dir: #The service file is only applicable to the RPMs which needs containerz workflow support.
+    - name: alpine #This has to be same as service's parent directory name below
+      dir: examples/alpine/service #Do not change
 ```
+The service dir above is only applicable to the RPMs which needs containerz workflow support.
+Life cycle of third-party application having service file will be managed via containerz workflow only.
+Users will not be able to perform app manager config post rpm installation on such applications.
+To include service-dir file structure in the rpm being built, an option "--containerz" has to be passed
+in the build command below explicitly.
+
 Build:
 `./appmgr_build -b examples/alpine/build.yaml`
 

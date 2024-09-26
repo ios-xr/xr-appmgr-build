@@ -41,6 +41,9 @@ def pkg_config_dir(package, *args):
 def pkg_data_dir(package, *args):
     return archive_dir(package, "data", *args)
 
+def pkg_service_dir(package, *args):
+    return archive_dir(package, "service", *args)
+
 def key_dir(*args):
     return archive_dir("keys", *args)
 
@@ -67,6 +70,9 @@ group = parser.add_mutually_exclusive_group(required=True)
 
 parser.add_argument(
     "-p", "--package_names", type=list_of_strings, help="Package name to be built"
+)
+parser.add_argument(
+    '--containerz', dest="containerz", default=False, help="option for containerz", action="store_true"
 )
 group.add_argument(
     "-b", "--build-config", dest="config", help="build configuration"
@@ -201,6 +207,35 @@ def make_owner_rpm_spec(package, pre, post, preun, install, files):
             for name in subfiles:
                 files.append("{}".format(normjoin(data_dest, root, name)))
 
+    install.append("")
+    install.append("# Service directory")
+    service_list = package.get("service-dir")
+    if args.containerz and service_list:
+        service_name = service_list[0]["name"]
+        # Destination directory
+        service_dest = os.path.join(
+            release_conf["paths"]["appmgr_source"], "owner",
+            service_name, "service"
+        )
+        # Directory to copy
+        service_dir = os.path.join("service", service_name)
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(service_dest))
+        install.append("mkdir -p %{{buildroot}}{}".format(service_dest))
+        files.append("%dir {}".format(service_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(service_dir, service_dest)
+        )
+
+        prefix = pkg_service_dir(package_name, service_name)
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_service_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(service_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(service_dest, root, name)))
+
+
 def make_partner_rpm_spec(package, pre, post, preun, install, files):
     install.append("# Sources")
     source_dest = os.path.join(release_conf["paths"]["appmgr_source"], "partner", package["partner-name"])
@@ -280,7 +315,7 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
         data_name = data_list[0]["name"]
         # Destination directory
         data_dest = os.path.join(
-            release_conf["paths"]["appmgr_source"], "partner",
+            release_conf["paths"]["appmgr_source"], "partner", package["partner-name"],
             data_name, "data"
         )
         # Directory to copy
@@ -299,6 +334,36 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
                 files.append("%dir {}".format(normjoin(data_dest, root, name)))
             for name in subfiles:
                 files.append("{}".format(normjoin(data_dest, root, name)))
+
+    install.append("")
+    install.append("# Service directory")
+    service_list = package.get("service-dir")
+    if args.containerz and service_list:
+        service_name = service_list[0]["name"]
+        # Destination directory
+        service_dest = os.path.join(
+            release_conf["paths"]["appmgr_source"], "partner", package["partner-name"],
+            service_name, "service"
+        )
+        # Directory to copy
+        service_dir = os.path.join("service", service_name)
+        pre.append("rm -rf $RPM_INSTALL_PREFIX{}".format(service_dest))
+        install.append("mkdir -p %{{buildroot}}{}".format(service_dest))
+        files.append("%dir {}".format(service_dest))
+        install.append(
+            "cp -arT {} %{{buildroot}}{}".format(service_dir, service_dest)
+        )
+
+        prefix = pkg_service_dir(package_name, service_name)
+        for root, subdirs, subfiles in os.walk(prefix):
+            # Make path relative to pkg_service_dir
+            root = os.path.relpath(root, start=prefix)
+            for name in subdirs:
+                files.append("%dir {}".format(normjoin(service_dest, root, name)))
+            for name in subfiles:
+                files.append("{}".format(normjoin(service_dest, root, name)))
+
+
 
 def make_native_rpm_spec(package, pre, post, preun, install, files):
     install.append("# Sources")
@@ -595,6 +660,16 @@ def add_partner_rpm_files(package, package_name):
         dest = pkg_data_dir(package_name, data_name)
         shutil.copytree(data_list[0]["dir"], dest)
 
+    print("Adding service...")
+    os.makedirs(pkg_service_dir(package_name), exist_ok=False)
+    print(" --->", package["name"])
+    service_list = package.get("service-dir")
+    if args.containerz and service_list:
+        service_name = service_list[0]["name"]
+        print(" --->", service_name)
+        dest = pkg_service_dir(package_name, service_name)
+        shutil.copytree(service_list[0]["dir"], dest)
+
 def add_owner_rpm_files(package, package_name):
     rpm_type = package["name"]
     release_conf.read(
@@ -643,6 +718,17 @@ def add_owner_rpm_files(package, package_name):
         print(" --->", data_name)
         dest = pkg_data_dir(package_name, data_name)
         shutil.copytree(data_list[0]["dir"], dest)
+
+    print("Adding service...")
+    os.makedirs(pkg_service_dir(package_name), exist_ok=False)
+    print(" --->", package["name"])
+    service_list = package.get("service-dir")
+    if args.containerz and service_list:
+        service_name = service_list[0]["name"]
+        print(" --->", service_name)
+        dest = pkg_service_dir(package_name, service_name)
+        shutil.copytree(service_list[0]["dir"], dest)
+
 
 def add_native_rpm_files(package, package_name):
     rpm_type = package["release"]
