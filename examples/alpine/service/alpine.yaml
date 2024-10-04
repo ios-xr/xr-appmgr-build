@@ -1,0 +1,5 @@
+application: alp-logger-cntz
+type: docker
+source: alpine
+run-opts: --net=host -it
+run-cmd: sh

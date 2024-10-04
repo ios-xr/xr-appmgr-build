@@ -43,6 +43,9 @@ packages:
   data-dir:
     - name: alpine
       dir: examples/alpine/data #Do not change
+  service-dir:
+    - name: alpine
+      dir: examples/alpine/service #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
@@ -60,6 +63,9 @@ packages:
   data-dir:
     - name: alpine
       dir: examples/alpine/data #Do not change
+  service-dir:
+    - name: alpine
+      dir: examples/alpine/service #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
