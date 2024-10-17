@@ -5,22 +5,28 @@ packages:
   target-release: "ThinXR_7.3.15" #Can be changed
   version: "0.1.0" #Can be changed
   sources:
-    - file: examples/alpine/alpine.tar.gz #Can be changed
+    - name: alpine
+      file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
-    - dir: examples/alpine/config #Do not change
+    - name: alpine
+      dir: examples/alpine/config #Do not change
   data-dir:
-    - dir: examples/alpine/data #Do not change
+    - name: alpine
+      dir: examples/alpine/data #Do not change
 
 - name: "alpine" #Can be changed
   release: "eXR_7.3.1" #Do not change
   target-release: "eXR_7.3.1" #Can be changed
   version: "0.1.0" #Can be changed
   sources:
-    - file: examples/alpine/alpine.tar.gz #Can be changed
+    - name: alpine
+      file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
-    - dir: examples/alpine/config #Do not change
+    - name: alpine
+      dir: examples/alpine/config #Do not change
   data-dir:
-    - dir: examples/alpine/data #Do not change
+    - name: alpine
+      dir: examples/alpine/data #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
@@ -29,11 +35,17 @@ packages:
   target-release: "7.10.1" #Can be changed
   version: "3.14" #Can be changed
   sources:
-    - file: examples/alpine/alpine.tar.gz #Can be changed
+    - name: alpine
+      file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
-    - dir: examples/alpine/config #Do not change
+    - name: alpine
+      dir: examples/alpine/config #Do not change
   data-dir:
-    - dir: examples/alpine/data #Do not change
+    - name: alpine
+      dir: examples/alpine/data #Do not change
+  service-dir:
+    - name: alpine
+      dir: examples/alpine/service #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
@@ -43,11 +55,17 @@ packages:
   version: "3.14" #Can be changed
   partner-name: "radware"
   sources:
-    - file: examples/alpine/alpine.tar.gz #Can be changed
+    - name: alpine
+      file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
-    - dir: examples/alpine/config #Do not change
+    - name: alpine
+      dir: examples/alpine/config #Do not change
   data-dir:
-    - dir: examples/alpine/data #Do not change
+    - name: alpine
+      dir: examples/alpine/data #Do not change
+  service-dir:
+    - name: alpine
+      dir: examples/alpine/service #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
@@ -56,12 +74,13 @@ packages:
   target-release: "7.3.6" #Can be changed
   version: "0.1.0" #Can be changed
   sources:
-    - dir: examples/pscript #Can be changed
+    - name: pscript
+      dir: examples/pscript #Can be changed
 
 - name: "owner-pscript" #Do not change
   release: "7.3.6" #Do not change
   target-release: "7.3.6" #Can be changed
-
   version: "0.1.0" #Can be changed
   sources:
-    - dir: examples/pscript #Can be changed
+    - name: pscript
+      dir: examples/pscript #Can be changed
