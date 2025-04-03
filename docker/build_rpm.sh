@@ -74,7 +74,7 @@ __EOF__
     echo "GPG key specified. Attempting to import key"
 fi
 
-/usr/bin/rpmbuild --verbose -bb ${spec_file} > ${log_file} 2>&1
+/usr/bin/rpmbuild --verbose --target=AARCH64 -bb ${spec_file} > ${log_file} 2>&1
 rpm_build_ec=$?
 
 if [[ $rpm_build_ec -eq 0 ]]; then
