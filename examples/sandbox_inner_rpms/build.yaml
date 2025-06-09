@@ -1,0 +1,9 @@
+#Refer README.md for more info
+packages:
+- name: "owner-alpine" #Do not change the prefix "owner"
+  release: "7.10.1" #Do not change
+  target-release: "7.10.1" #Can be changed
+  version: "3.14" #Can be changed
+  sources:
+    - name: sandbox
+      dir: examples/sandbox_inner_rpms/rpms #Can be changed

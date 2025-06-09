@@ -242,6 +242,70 @@ Summary     : owner-pscript 0.1.0 compiled for IOS-XR 24.1.1
 Description :
 This packages the artifacts required to run a 3rd party app
 ```
+# Building an Sandbox outer RPM to be installed using XR cli workflow
+Create a `build.yaml` file and add entries for your app
+```
+- name: "owner-alpine" #Do not change the prefix "owner"
+  release: "7.10.1" #Do not change
+  target-release: "7.10.1" #Can be changed
+  version: "3.14" #Can be changed
+  sources:
+    - name: sandbox
+      dir: examples/sandbox_inner_rpms/rpms #Can be changed
+```
+Build:
+`./appmgr_build -b examples/sandbox_inner_rpms/build.yaml --sandbox`
+
+Once the RPM is built, scp it to the router, and install.
+
+```
+scp RPMS/x86_64/RPMS/x86_64/owner-alpine-3.14-7.10.1.x86_64.rpm <router>:/harddisk:/owner-alpine/
+```
+You can install the RPM with the following:
+(As it's not a docker container, no need to activate this rpm)
+```
+install source /harddisk:/owner-alpine/ all
+```
+
+You can uninstall the RPM with the following:
+```
+install package remove owner-alpine
+```
+The files in the rpm, will be copied to below location in the device
+```
+/opt/owner/sandbox/
+```
+
+You can get rpm details using below commands
+```
+rpm -qpl RPMS/x86_64/owner-alpine-3.14-7.10.1.x86_64.rpm
+warning: RPMS/x86_64/owner-alpine-3.14-7.10.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID b98f0200: NOKEY
+/opt/owner/sandbox
+/opt/owner/sandbox/owner-alpine-3.14-7.11.1.x86_64.rpm
+
+
+rpm -qpi RPMS/x86_64/owner-alpine-3.14-7.10.1.x86_64.rpm
+warning: RPMS/x86_64/owner-alpine-3.14-7.10.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID b98f0200: NOKEY
+Name        : owner-alpine
+Version     : 3.14
+Release     : 7.10.1
+Architecture: x86_64
+Install Date: (not installed)
+Group       : 3rd party application
+Size        : 6485188
+License     : Copyright (c) 2024 Cisco Systems Inc. All rights reserved
+Signature   : DSA/SHA1, Wed 14 May 2025 04:57:29 PM IST, Key ID a0fef849b98f0200
+Source RPM  : owner-alpine-3.14-7.10.1.src.rpm
+Build Date  : Wed 14 May 2025 04:57:29 PM IST
+Build Host  : 41c1b44adfd0
+Relocations : / 
+Packager    : cisco
+Summary     : owner-alpine 3.14 compiled for IOS-XR 7.10.1
+Description :
+RPM built for use with IOS-XR appmgr.
+
+XR-appmgr-build version: 46055cab7d8ceff6fd1c3444195761574ac2e146
+
 # Build and Setup instructions
 
 ## Setting up the build environment
