@@ -878,8 +878,6 @@ def add_ownerpscript_rpm_files(package, package_name):
 
 
 def add_sandbox_inner_rpm_files(package, package_name):
-    import pdb
-    pdb.set_trace()
     rpm_type = package["name"]
     release_conf.read(
         os.path.join(RELEASE_CONF_DIR, rpm_type.split('-')[0] +".ini")
