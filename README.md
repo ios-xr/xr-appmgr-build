@@ -4,7 +4,7 @@ Scripts to build RPMs for use with the XR appmgr.
 # Building an RPM to be installed using appmgr cli workflow
 (Scriplets support will be deprecated soon using this install method)
 
-Create a `build.yaml` file and add entries for your app
+Create a `build.yaml` file and add entries for the app
 ```
 packages:
 - name: "alpine" # Will be the name of the rpm (Editable)
@@ -33,7 +33,7 @@ Once the RPM is built, scp it to the router, and install.
 scp RPMS/x86_64/alpine-0.1.0-eXR_7.3.1.x86_64.rpm <router>:/harddisk:
 ```
 
-Note that if you specify `copy_ems_cert` you must install the RPM after gRPC is configured (see above). The post-install script requires the ems certificate to have been created at install time or the application will be unable to access it.
+Note that if `copy_ems_cert` is specified, the RPM must be installed after gRPC is configured (see above). The post-install script requires the ems certificate to have been created at install time or the application will be unable to access it.
 "grpc no-tls config should not be used if copy_ems_cert option is specified"
 
 
@@ -45,8 +45,7 @@ Config:
 ```
 appmgr application alpine activate type docker source alpine docker-run-opts "-v {app_install_root}/config/alpine-configs:/root/config"
 ```
-
-You can uninstall the RPM with the following:
+To uninstall the RPM, use the following command:
 ```
 appmgr package uninstall package alpine-0.1.0-eXR_7.3.1.x86_64
 ```
@@ -55,7 +54,7 @@ appmgr package uninstall package alpine-0.1.0-eXR_7.3.1.x86_64
 # Building an RPM to be installed using XR install cli workflow(LNT platform only)
 (Scriplets are not supported using this install method)
 
-Create a `build.yaml` file and add entries for your app
+Create a `build.yaml` file and add entries for the app
 ```
 - name: "partner-alpine" # Prefix "owner-" or "partner-" for TPA apps (Prefix not editable)
   release: "7.10.1" # This is the release since when the support for this rpm has started and should correspond to a file in release_configs dir (Not editable)
@@ -91,7 +90,7 @@ Once the RPM is built, create a directory on the router at /harddisk:/owner-alpi
 scp RPMS/x86_64/alpine-0.1.0-eXR_7.3.1.x86_64.rpm <router>:/harddisk:/owner-alpine/
 ```
 
-Note that if you specify `copy_ems_cert` you must install the RPM after gRPC is configured (see above). The post-install script requires the ems certificate to have been created at install time or the application will be unable to access it.
+Note that if `copy_ems_cert` is specified, the RPM must be installed after gRPC is configured (see above). The post-install script requires the ems certificate to have been created at install time or the application will be unable to access it.
 "grpc no-tls config should not be used if copy_ems_cert option is specified"
 
 
@@ -105,13 +104,13 @@ Config:
 appmgr application alpine activate type docker source alpine docker-run-opts "-v {app_install_root}/config/alpine-configs:/root/config"
 ```
 
-You can uninstall the RPM with the following:
+The RPM can be uninstalled with the following:
 ```
 install package remove owner-alpine
 ```
 
 # Building a process-script RPM to be installed using appmgr cli workflow
-Create a `build.yaml` file and add entries for your app
+Create a `build.yaml` file and add entries for the app
 ```
 - name: "pscript" #This should not be changed (Not editable)
   release: "24.1.1" # This is the release since when the support for this rpm has started and should correspond to a file in release_configs dir (Not editable)
@@ -130,14 +129,14 @@ Once the RPM is built, scp it to the router, and install.
 ```
 scp RPMS/x86_64/pscript-0.1.0-24.1.1.x86_64.rpm <router>:/harddisk:
 ```
-You can install the RPM with the following:
+The RPM can be installed with the following:
 (As it's not a docker container, no need to activate this rpm)
 ```
 appmgr package install rpm /harddisk:/pscript-0.1.0-24.1.1.x86_64.rpm
 ```
 
 Config:
-You can uninstall the RPM with the following:
+The RPM can be uninstalled with the following:
 ```
 appmgr package uninstall package pscript-0.1.0-24.1.1.x86_64.rpm
 ```
@@ -146,7 +145,7 @@ The files in the rpm, will be copied to below location in the device
 /var/lib/docker/appmgr/ops-script-repo/exec/
 ```
 
-You can get rpm details using below commands
+RPM details can be obtained using below commands
 ```
 rpm -qpl RPMS/x86_64/pscript-0.1.0-24.1.1.x86_64.rpm
 warning: RPMS/x86_64/pscript-0.1.0-24.1.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID 73f45f20: NOKEY
@@ -172,15 +171,15 @@ Relocations : /
 Packager    : cisco
 Summary     : pscript 0.1.0 compiled for IOS-XR 24.1.1
 ```
-We can optionally pass comma separated package name(s) in build command with -p option
+Optionally pass comma separated package name(s) in build command with -p option
 ```
 ./appmgr_build -b examples/alpine/build.yaml -p alpine,pscript
 
-If we don't pass -p option, it will build for all the packages in build.yaml file.
+If -p option is not passed, the build will process all packages in build.yaml file.
 ```
 
 # Building an owner-process-script RPM to be installed using XR cli workflow
-Create a `build.yaml` file and add entries for your app
+Create a `build.yaml` file and add entries for the app
 ```
 - name: "owner-pscript" #This should not be changed (Not editable)
   release: "24.1.1" # This is the release since when the support for this rpm has started and should correspond to a file in release_configs dir (Not editable)
@@ -199,13 +198,13 @@ Once the RPM is built, scp it to the router, and install.
 ```
 scp RPMS/x86_64/owner-pscript-0.1.0-24.1.1.x86_64.rpm <router>:/harddisk:/owner-pscript/
 ```
-You can install the RPM with the following:
+The RPM can be installed with the following:
 (As it's not a docker container, no need to activate this rpm)
 ```
 install source /harddisk:/owner-pscript/ all
 ```
 
-You can uninstall the RPM with the following:
+The RPM can be uninstalled with the following:
 ```
 install package remove owner-alpine
 ```
@@ -214,7 +213,7 @@ The files in the rpm, will be copied to below location in the device
 /opt/owner/ops-script-repo/exec/
 ```
 
-You can get rpm details using below commands
+RPM details can be obtained using below commands
 ```
 rpm -qpl RPMS/x86_64/owner-pscript-0.1.0-24.1.1.x86_64.rpm
 warning: RPMS/x86_64/owner-pscript-0.1.0-24.1.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID 73f45f20: NOKEY
@@ -243,7 +242,7 @@ Description :
 This packages the artifacts required to run a 3rd party app
 ```
 # Building an Sandbox outer RPM to be installed using XR cli workflow
-Create a `build.yaml` file and add entries for your app
+Create a `build.yaml` file and add entries for the app
 ```
 - name: "owner-alpine" #Do not change the prefix "owner"
   release: "7.10.1" #Do not change
@@ -261,13 +260,13 @@ Once the RPM is built, scp it to the router, and install.
 ```
 scp RPMS/x86_64/RPMS/x86_64/owner-alpine-3.14-7.10.1.x86_64.rpm <router>:/harddisk:/owner-alpine/
 ```
-You can install the RPM with the following:
+The RPM can be installed with the following:
 (As it's not a docker container, no need to activate this rpm)
 ```
 install source /harddisk:/owner-alpine/ all
 ```
 
-You can uninstall the RPM with the following:
+The RPM can be uninstalled with the following:
 ```
 install package remove owner-alpine
 ```
@@ -276,7 +275,7 @@ The files in the rpm, will be copied to below location in the device
 /opt/owner/sandbox/
 ```
 
-You can get rpm details using below commands
+RPM details can be obtained using below commands
 ```
 rpm -qpl RPMS/x86_64/owner-alpine-3.14-7.10.1.x86_64.rpm
 warning: RPMS/x86_64/owner-alpine-3.14-7.10.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID b98f0200: NOKEY
