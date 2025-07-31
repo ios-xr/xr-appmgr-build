@@ -130,7 +130,7 @@ def make_owner_rpm_spec(package, pre, post, preun, install, files):
             )
         )
         install.append(
-            "cp -ar {} %{{buildroot}}{}".format(
+            "cp -r {} %{{buildroot}}{}".format(
                 os.path.join("sources", source_name), source_dest
             )
         )
@@ -150,7 +150,7 @@ def make_owner_rpm_spec(package, pre, post, preun, install, files):
         install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
         files.append("%dir {}".format(conf_dest))
         install.append(
-            "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
+            "cp -rT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
         )
 
         prefix = pkg_config_dir(package_name, config_name)
@@ -200,7 +200,7 @@ def make_owner_rpm_spec(package, pre, post, preun, install, files):
         install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
         files.append("%dir {}".format(data_dest))
         install.append(
-            "cp -arT {} %{{buildroot}}{}".format(data_dir, data_dest)
+            "cp -rT {} %{{buildroot}}{}".format(data_dir, data_dest)
         )
 
         prefix = pkg_data_dir(package_name, data_name)
@@ -228,7 +228,7 @@ def make_owner_rpm_spec(package, pre, post, preun, install, files):
         install.append("mkdir -p %{{buildroot}}{}".format(service_dest))
         files.append("%dir {}".format(service_dest))
         install.append(
-            "cp -arT {} %{{buildroot}}{}".format(service_dir, service_dest)
+            "cp -rT {} %{{buildroot}}{}".format(service_dir, service_dest)
         )
 
         prefix = pkg_service_dir(package_name, service_name)
@@ -259,7 +259,7 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
             )
         )
         install.append(
-            "cp -ar {} %{{buildroot}}{}".format(
+            "cp -r {} %{{buildroot}}{}".format(
                 os.path.join("sources", source_name), source_dest
             )
         )
@@ -279,7 +279,7 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
         install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
         files.append("%dir {}".format(conf_dest))
         install.append(
-            "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
+            "cp -rT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
         )
 
         prefix = pkg_config_dir(package_name, config_name)
@@ -329,7 +329,7 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
         install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
         files.append("%dir {}".format(data_dest))
         install.append(
-            "cp -arT {} %{{buildroot}}{}".format(data_dir, data_dest)
+            "cp -rT {} %{{buildroot}}{}".format(data_dir, data_dest)
         )
         prefix = pkg_data_dir(package_name, data_name)
         for root, subdirs, subfiles in os.walk(prefix):
@@ -356,7 +356,7 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
         install.append("mkdir -p %{{buildroot}}{}".format(service_dest))
         files.append("%dir {}".format(service_dest))
         install.append(
-            "cp -arT {} %{{buildroot}}{}".format(service_dir, service_dest)
+            "cp -rT {} %{{buildroot}}{}".format(service_dir, service_dest)
         )
 
         prefix = pkg_service_dir(package_name, service_name)
@@ -386,7 +386,7 @@ def make_native_rpm_spec(package, pre, post, preun, install, files):
             )
         )
         install.append(
-            "cp -ar {} %{{buildroot}}{}".format(
+            "cp -r {} %{{buildroot}}{}".format(
                 os.path.join("sources", source_name), source_dest
             )
         )
@@ -408,7 +408,7 @@ def make_native_rpm_spec(package, pre, post, preun, install, files):
         install.append("mkdir -p %{{buildroot}}{}".format(conf_dest))
         files.append("%dir {}".format(conf_dest))
         install.append(
-            "cp -arT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
+            "cp -rT {} %{{buildroot}}{}".format(conf_dir, conf_dest)
         )
 
         prefix = pkg_config_dir(package_name, config_name)
@@ -458,7 +458,7 @@ def make_native_rpm_spec(package, pre, post, preun, install, files):
         install.append("mkdir -p %{{buildroot}}{}".format(data_dest))
         files.append("%dir {}".format(data_dest))
         install.append(
-            "cp -arT {} %{{buildroot}}{}".format(data_dir, data_dest)
+            "cp -rT {} %{{buildroot}}{}".format(data_dir, data_dest)
         )
 
         prefix = pkg_data_dir(package_name, data_name)
@@ -483,7 +483,7 @@ def make_pscript_rpm_spec(package, pre, post, preun, install, files):
             "%dir {}".format(os.path.join(source_dest, source_name))
         )
         install.append(
-            "cp -ar {} %{{buildroot}}{}".format(
+            "cp -r {} %{{buildroot}}{}".format(
                 os.path.join("sources", source_name), source_dest
             )
         )
@@ -507,7 +507,7 @@ def make_ownerpscript_rpm_spec(package, pre, post, preun, install, files):
             "%dir {}".format(os.path.join(source_dest, source_name))
         )
         install.append(
-            "cp -ar {} %{{buildroot}}{}".format(
+            "cp -r {} %{{buildroot}}{}".format(
                 os.path.join("sources", source_name), source_dest
             )
         )
@@ -531,7 +531,7 @@ def make_ownersandbox_rpm_spec(package, pre, post, preun, install, files):
             "%dir {}".format(os.path.join(source_dest, source_name))
         )
         install.append(
-            "cp -ar {} %{{buildroot}}{}".format(
+            "cp -r {} %{{buildroot}}{}".format(
                 os.path.join("sources", source_name), source_dest
             )
         )
@@ -923,7 +923,7 @@ for package in config["packages"]:
 
     print("Starting to build package:", package["name"])
 
-    if "sandbox" in package["name"]:
+    if (not args.sandbox) and ("sandbox" in package["name"]):
         print("package name sandbox is not permitted")
         continue
 
