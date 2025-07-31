@@ -923,7 +923,7 @@ for package in config["packages"]:
 
     print("Starting to build package:", package["name"])
 
-    if "sandbox" in package["name"]:
+    if (not args.sandbox) and ("sandbox" in package["name"]):
         print("package name sandbox is not permitted")
         continue
 
