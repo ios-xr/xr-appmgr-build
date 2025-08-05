@@ -84,3 +84,12 @@ packages:
   sources:
     - name: pscript
       dir: examples/pscript #Can be changed
+
+- name: "partner-pscript" #Do not change
+  release: "7.3.6" #Do not change
+  target-release: "7.3.6" #Can be changed
+  version: "0.1.0" #Can be changed
+  partner-name: "radware"
+  sources:
+    - name: pscript
+      dir: examples/pscript #Can be changed

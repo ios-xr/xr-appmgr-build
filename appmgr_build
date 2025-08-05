@@ -517,6 +517,29 @@ def make_ownerpscript_rpm_spec(package, pre, post, preun, install, files):
             )
         )
 
+def make_partnerpscript_rpm_spec(package, pre, post, preun, install, files):
+    install.append("# Sources")
+    source_dest = os.path.join(release_conf["paths"]["appmgr_source"], "exec", package["partner-name"])
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        install.append("mkdir -p %{{buildroot}}{}".format(source_dest))
+        files.append("%defattr(-,root,root)")
+        files.append(source_dest)
+        files.append(
+            "%dir {}".format(os.path.join(source_dest, source_name))
+        )
+        install.append(
+            "cp -r {} %{{buildroot}}{}".format(
+                os.path.join("sources", source_name), source_dest
+            )
+        )
+        pre.append(
+            "rm -rf $RPM_INSTALL_PREFIX{}".format(
+                os.path.join(source_dest, source_name)
+            )
+        )
+
 def make_ownersandbox_rpm_spec(package, pre, post, preun, install, files):
     install.append("# Sources")
     source_dest = os.path.join(release_conf["paths"]["appmgr_source"], "owner")
@@ -617,6 +640,9 @@ def make_spec(package):
 
     if package["name"].startswith('owner-pscript'):
         make_ownerpscript_rpm_spec(package, pre, post, preun, install, files)
+
+    elif package["name"].startswith('partner-pscript'):
+        make_partnerpscript_rpm_spec(package, pre, post, preun, install, files)
 
     elif package["name"].startswith('pscript'):
         make_pscript_rpm_spec(package, pre, post, preun, install, files)
@@ -876,6 +902,38 @@ def add_ownerpscript_rpm_files(package, package_name):
             sys.exit(1)
         shutil.copytree(source_list[0]["dir"], dest)
 
+def add_partnerpscript_rpm_files(package, package_name):
+    release_conf.read(
+        os.path.join(RELEASE_CONF_DIR, package["name"] + ".ini")
+    )
+
+    print("Building docker image {}...".format(release_conf["build"]["image"]))
+
+    try:
+        subprocess.run(["make", release_conf["build"]["image"]], cwd=dirname)
+    except subprocess.CalledProcessError:
+        print(
+            "Could not build docker image {}".format(
+                release_conf["build"]["image"]
+            )
+        )
+        sys.exit(1)
+
+    print("Adding sources...")
+    source_list = package.get("sources")
+    if source_list:
+        source_name = source_list[0]["name"]
+        print(" --->", source_name)
+        dest = pkg_source_dir(package_name, source_name)
+        os.makedirs(dest, exist_ok=False)
+        shutil.rmtree(dest, ignore_errors=True)
+        if not os.listdir(source_list[0]["dir"]):
+            print("The pscript directory should not be empty ", source_list[0]["dir"])
+            sys.exit(1)
+        elif len(os.listdir(source_list[0]["dir"])) == 1 and os.path.isfile(os.path.join(source_list[0]["dir"] + "/.gitignore")):
+            print("Please add files to be added to pscript directory ", source_list[0]["dir"])
+            sys.exit(1)
+        shutil.copytree(source_list[0]["dir"], dest)
 
 def add_sandbox_inner_rpm_files(package, package_name):
     rpm_type = package["name"]
@@ -934,17 +992,19 @@ for package in config["packages"]:
     else:
         package_name = "{name}-{version}".format(**package)
     print(" --->", package["name"])
-    if package["name"].startswith('partner-'):
-        add_partner_rpm_files(package, package_name)
-    elif package["name"].startswith('pscript'):
+    if package["name"].startswith('pscript'):
         add_pscript_rpm_files(package, package_name)
     elif package["name"].startswith('owner-pscript'):
         add_ownerpscript_rpm_files(package, package_name)
+    elif package["name"].startswith('partner-pscript'):
+        add_partnerpscript_rpm_files(package, package_name)
     elif package["name"].startswith('owner-'):
         if args.sandbox:
             add_sandbox_inner_rpm_files(package, package_name)
         else:
             add_owner_rpm_files(package, package_name)
+    elif package["name"].startswith('partner-'):
+        add_partner_rpm_files(package, package_name)
     else:
         add_native_rpm_files(package, package_name)
     gpg_key = package.get("gpg_key")
