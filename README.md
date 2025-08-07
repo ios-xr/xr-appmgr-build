@@ -244,7 +244,7 @@ Summary     : owner-pscript 0.1.0 compiled for IOS-XR 24.1.1
 Description :
 This packages the artifacts required to run a 3rd party app
 ```
-# Building an partner-process-script RPM to be installed using XR cli workflow
+# Building a partner-process-script RPM to be installed using XR cli workflow
 Create a `build.yaml` file and add entries for the app
 ```
 packages:
@@ -264,7 +264,7 @@ Build:
 Once the RPM is built, scp it to the router, and install.
 
 ```
-scp RPMS/x86_64/partner-pscript-0.1.0-24.1.1.x86_64.rpm <router>:/harddisk:/partner-pscript/
+scp RPMS/x86_64/partner-pscript-0.1.0-25.4.1.x86_64.rpm <router>:/harddisk:/partner-pscript/
 ```
 The RPM can be installed with the following:
 (As it's not a docker container, no need to activate this rpm)
@@ -311,7 +311,7 @@ Description :
 RPM built for use with IOS-XR appmgr.
 ```
 
-# Building an Sandbox outer RPM to be installed using XR cli workflow
+# Building a Sandbox outer RPM to be installed using XR cli workflow
 Create a `build.yaml` file and add entries for the app
 ```
 - name: "owner-alpine" #Do not change the prefix "owner"
