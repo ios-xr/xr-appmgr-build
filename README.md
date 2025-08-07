@@ -56,6 +56,7 @@ appmgr package uninstall package alpine-0.1.0-eXR_7.3.1.x86_64
 
 Create a `build.yaml` file and add entries for the app
 ```
+packages:
 - name: "partner-alpine" # Prefix "owner-" or "partner-" for TPA apps (Prefix not editable)
   release: "7.10.1" # This is the release since when the support for this rpm has started and should correspond to a file in release_configs dir (Not editable)
   target-release: "7.10.1" # If present, this is the release for rpms to be installed, else above release is used. (Editable)
@@ -112,6 +113,7 @@ install package remove owner-alpine
 # Building a process-script RPM to be installed using appmgr cli workflow
 Create a `build.yaml` file and add entries for the app
 ```
+packages:
 - name: "pscript" #This should not be changed (Not editable)
   release: "24.1.1" # This is the release since when the support for this rpm has started and should correspond to a file in release_configs dir (Not editable)
   target-release: "24.1.1" # If present, RPM name will have this target-release name, else will have above release name (Editable)
@@ -181,6 +183,7 @@ If -p option is not passed, the build will process all packages in build.yaml fi
 # Building an owner-process-script RPM to be installed using XR cli workflow
 Create a `build.yaml` file and add entries for the app
 ```
+packages:
 - name: "owner-pscript" #This should not be changed (Not editable)
   release: "24.1.1" # This is the release since when the support for this rpm has started and should correspond to a file in release_configs dir (Not editable)
   target-release: "24.1.1" # If present, RPM name will have this target-release name, else will have above release name (Editable)
@@ -241,6 +244,73 @@ Summary     : owner-pscript 0.1.0 compiled for IOS-XR 24.1.1
 Description :
 This packages the artifacts required to run a 3rd party app
 ```
+# Building an partner-process-script RPM to be installed using XR cli workflow
+Create a `build.yaml` file and add entries for the app
+```
+packages:
+- name: "partner-pscript" #This should not be changed (Not editable)
+  release: "25.4.1" # This is the release since when the support for this rpm has started and should correspond to a file in release_configs dir (Not editable)
+  target-release: "24.1.1" # If present, RPM name will have this target-release name, else will have above release name (Editable)
+  version: "0.1.0" # Application semantic version (Editable)
+  partner-name: "radware" # Name of the partner (Editable)
+  sources:
+    - name: pscript # Update this with the rpm name to be built (Editable)
+      dir: examples/pscript # All the files in this direcotory to be copied to process-script rpm (Editable)
+
+```
+Build:
+`./appmgr_build -b examples/alpine/build.yaml`
+
+Once the RPM is built, scp it to the router, and install.
+
+```
+scp RPMS/x86_64/partner-pscript-0.1.0-24.1.1.x86_64.rpm <router>:/harddisk:/partner-pscript/
+```
+The RPM can be installed with the following:
+(As it's not a docker container, no need to activate this rpm)
+```
+install source /harddisk:/partner-pscript/ all
+```
+
+The RPM can be uninstalled with the following:
+```
+install package remove partner-pscript
+```
+The files in the rpm, will be copied to below location in the device
+```
+/opt/partner/radware/ops-script-repo/exec/
+```
+
+RPM details can be obtained using below commands
+```
+rpm -qpl RPMS/x86_64/partner-pscript-0.1.0-25.4.1.x86_64.rpm
+warning: RPMS/x86_64/partner-pscript-0.1.0-25.4.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID 73f45f20: NOKEY
+/opt/partner/radware/ops-script-repo/exec
+/opt/partner/radware/ops-script-repo/exec/pscript
+/opt/partner/radware/ops-script-repo/exec/pscript/.gitignore
+/opt/partner/radware/ops-script-repo/exec/pscript/test
+
+rpm -qpi RPMS/x86_64/partner-pscript-0.1.0-25.4.1.x86_64.rpm
+warning: partner-pscript-0.1.0-25.4.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID 530b8c02: NOKEY
+Name        : partner-pscript
+Version     : 0.1.0
+Release     : 7.3.6
+Architecture: x86_64
+Install Date: (not installed)
+Group       : 3rd party application
+Size        : 71
+License     : Copyright (c) 2024 Cisco Systems Inc. All rights reserved
+Signature   : RSA/SHA256, Tue 05 Aug 2025 11:08:44 PM PDT, Key ID 747278115c06976b
+Source RPM  : partner-pscript-0.1.0-7.3.6.src.rpm
+Build Date  : Tue 05 Aug 2025 11:00:35 PM PDT
+Build Host  : bf41ba0cee3c
+Relocations : /
+Packager    : cisco
+Summary     : partner-pscript 0.1.0 compiled for IOS-XR 7.3.6
+Description :
+RPM built for use with IOS-XR appmgr.
+```
+
 # Building an Sandbox outer RPM to be installed using XR cli workflow
 Create a `build.yaml` file and add entries for the app
 ```
