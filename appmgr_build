@@ -519,7 +519,7 @@ def make_ownerpscript_rpm_spec(package, pre, post, preun, install, files):
 
 def make_partnerpscript_rpm_spec(package, pre, post, preun, install, files):
     install.append("# Sources")
-    source_dest = os.path.join(release_conf["paths"]["appmgr_source"], package["partner-name"], "ops-script-repo", "exec")
+    source_dest = os.path.join(release_conf["paths"]["appmgr_source"], "ops-script-repo", "exec", package["partner-name"])
     source_list = package.get("sources")
     if source_list:
         source_name = source_list[0]["name"]

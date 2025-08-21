@@ -278,17 +278,17 @@ install package remove partner-pscript
 ```
 The files in the rpm, will be copied to below location in the device
 ```
-/opt/partner/radware/ops-script-repo/exec/
+/opt/partner/ops-script-repo/exec/radware/
 ```
 
 RPM details can be obtained using below commands
 ```
 rpm -qpl RPMS/x86_64/partner-pscript-0.1.0-25.4.1.x86_64.rpm
 warning: RPMS/x86_64/partner-pscript-0.1.0-25.4.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID 73f45f20: NOKEY
-/opt/partner/radware/ops-script-repo/exec
-/opt/partner/radware/ops-script-repo/exec/pscript
-/opt/partner/radware/ops-script-repo/exec/pscript/.gitignore
-/opt/partner/radware/ops-script-repo/exec/pscript/test
+/opt/partner/ops-script-repo/exec/radware
+/opt/partner/ops-script-repo/exec/radware/pscript
+/opt/partner/ops-script-repo/exec/radware/pscript/.gitignore
+/opt/partner/ops-script-repo/exec/radware/pscript/test
 
 rpm -qpi RPMS/x86_64/partner-pscript-0.1.0-25.4.1.x86_64.rpm
 warning: partner-pscript-0.1.0-25.4.1.x86_64.rpm: Header V4 DSA/SHA1 Signature, key ID 530b8c02: NOKEY
