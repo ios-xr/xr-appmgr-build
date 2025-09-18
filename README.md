@@ -180,7 +180,7 @@ Optionally pass comma separated package name(s) in build command with -p option
 If -p option is not passed, the build will process all packages in build.yaml file.
 ```
 
-Optionally pass target platform name(s) in build command with -t option
+Optionally pass target platform name in build command with -t option
 ```
 ./appmgr_build -b examples/alpine/build.yaml -t aarch64
 
