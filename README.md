@@ -180,6 +180,13 @@ Optionally pass comma separated package name(s) in build command with -p option
 If -p option is not passed, the build will process all packages in build.yaml file.
 ```
 
+Optionally pass target platform name(s) in build command with -t option
+```
+./appmgr_build -b examples/alpine/build.yaml -t aarch64
+
+If -t option is not passed, rpms will be built for x86_64 platform.
+```
+
 # Building an owner-process-script RPM to be installed using XR cli workflow
 Create a `build.yaml` file and add entries for the app
 ```
