@@ -173,19 +173,6 @@ Relocations : /
 Packager    : cisco
 Summary     : pscript 0.1.0 compiled for IOS-XR 24.1.1
 ```
-Optionally pass comma separated package name(s) in build command with -p option
-```
-./appmgr_build -b examples/alpine/build.yaml -p alpine,pscript
-
-If -p option is not passed, the build will process all packages in build.yaml file.
-```
-
-Optionally pass target platform name in build command with -t option
-```
-./appmgr_build -b examples/alpine/build.yaml -t aarch64
-
-If -t option is not passed, rpms will be built for x86_64 platform.
-```
 
 # Building an owner-process-script RPM to be installed using XR cli workflow
 Create a `build.yaml` file and add entries for the app
@@ -381,8 +368,23 @@ Description :
 RPM built for use with IOS-XR appmgr.
 
 XR-appmgr-build version: 46055cab7d8ceff6fd1c3444195761574ac2e146
+```
 
 # Build and Setup instructions
+
+Optionally pass comma separated package name(s) in build command with -p option
+```
+./appmgr_build -b examples/alpine/build.yaml -p alpine,pscript
+
+If -p option is not passed, the build will process all packages in build.yaml file.
+```
+
+Optionally pass target architecture name in build command with -t option
+```
+./appmgr_build -b examples/alpine/build.yaml -t aarch64
+
+If -t option is not passed, rpms will be built for x86_64 architecture.
+```
 
 ## Setting up the build environment
 The RPM build takes place inside a docker container. The image for the container is defined in the corresponding release config file. The corresponding docker image is built as a part of each RPM build.
