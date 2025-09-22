@@ -69,7 +69,7 @@ group = parser.add_mutually_exclusive_group(required=True)
 
 
 parser.add_argument(
-    '-t', "--aarch",  type=str, help="option for architectures (e.g x86_64, aarch64"
+    '-t', "--target",  type=str, help="option for target architecture (e.g x86_64, aarch64"
 )
 
 parser.add_argument(
@@ -1040,8 +1040,8 @@ for package in config["packages"]:
 
     spec_file = os.path.join(release_conf["build"]["rpm_spec_dir"], spec_name)
     target = "x86_64"
-    if args.aarch:
-        target = args.aarch
+    if args.target:
+        target = args.target
 
     command = [
         "/usr/sbin/build_rpm.sh",
