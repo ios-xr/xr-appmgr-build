@@ -18,6 +18,7 @@ while true; do
   case "$1" in
     -v | --verbose )         VERBOSE=true; shift ;;
     -h | --help )            echo "$usage"; exit 0 ;;
+    -t | --target )          target=$2;shift; shift;;
     -s | --spec-file )       spec_file=$2;shift; shift;; 
     -k | --gpg-key )         gpg_key=$2;shift; shift;;
     -r | --source-dir )      source_dir=$2;shift; shift;;
@@ -74,7 +75,7 @@ __EOF__
     echo "GPG key specified. Attempting to import key"
 fi
 
-/usr/bin/rpmbuild --verbose -bb ${spec_file} > ${log_file} 2>&1
+/usr/bin/rpmbuild --verbose --target=${target} -bb ${spec_file} > ${log_file} 2>&1
 rpm_build_ec=$?
 
 if [[ $rpm_build_ec -eq 0 ]]; then

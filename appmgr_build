@@ -69,8 +69,13 @@ group = parser.add_mutually_exclusive_group(required=True)
 
 
 parser.add_argument(
+    '-t', "--target",  type=str, help="option for target architecture (e.g x86_64, aarch64"
+)
+
+parser.add_argument(
     "-p", "--package_names", type=list_of_strings, help="Package name to be built"
 )
+
 parser.add_argument(
     '--containerz', dest="containerz", default=False, help="option for containerz", action="store_true"
 )
@@ -1034,8 +1039,14 @@ for package in config["packages"]:
         f.write(spec)
 
     spec_file = os.path.join(release_conf["build"]["rpm_spec_dir"], spec_name)
+    target = "x86_64"
+    if args.target:
+        target = args.target
+
     command = [
         "/usr/sbin/build_rpm.sh",
+        "--target",
+        target,
         "--spec-file",
         spec_file,
         "--source-dir",
