@@ -8,11 +8,9 @@ packages:
     - name: alpine
       file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
-    - name: alpine
-      dir: examples/alpine/config #Do not change
+    - dir: examples/alpine/config #Do not change
   data-dir:
-    - name: alpine
-      dir: examples/alpine/data #Do not change
+    - dir: examples/alpine/data #Do not change
 
 - name: "alpine" #Can be changed
   release: "eXR_7.3.1" #Do not change
@@ -22,11 +20,9 @@ packages:
     - name: alpine
       file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
-    - name: alpine
-      dir: examples/alpine/config #Do not change
+    - dir: examples/alpine/config #Do not change
   data-dir:
-    - name: alpine
-      dir: examples/alpine/data #Do not change
+    - dir: examples/alpine/data #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
@@ -38,14 +34,11 @@ packages:
     - name: alpine
       file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
-    - name: alpine
-      dir: examples/alpine/config #Do not change
+    - dir: examples/alpine/config #Do not change
   data-dir:
-    - name: alpine
-      dir: examples/alpine/data #Do not change
+    - dir: examples/alpine/data #Do not change
   service-dir:
-    - name: alpine
-      dir: examples/alpine/service #Do not change
+    - dir: examples/alpine/service #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
@@ -58,14 +51,11 @@ packages:
     - name: alpine
       file: examples/alpine/alpine.tar.gz #Can be changed
   config-dir:
-    - name: alpine
-      dir: examples/alpine/config #Do not change
+    - dir: examples/alpine/config #Do not change
   data-dir:
-    - name: alpine
-      dir: examples/alpine/data #Do not change
+    - dir: examples/alpine/data #Do not change
   service-dir:
-    - name: alpine
-      dir: examples/alpine/service #Do not change
+    - dir: examples/alpine/service #Do not change
   copy_hostname: true
   copy_ems_cert: true
 
