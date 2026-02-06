@@ -18,12 +18,13 @@ import shlex
 # INTERNAL DIRECTORIES
 # Move these to a seperate file
 dirname = os.path.dirname(os.path.abspath(__file__))
+print(dirname)
 RELEASE_CONF_DIR = os.path.join(dirname, "release_configs")
 SPEC_DIR = os.path.join(dirname, "build/specs")
 RPM_DIR = os.path.join(dirname, "RPMS")
 ARCHIVE_DIR = os.path.join(dirname, "build/archives")
 KEY_DIR = os.path.join(dirname, "build/archives/keys")
-RPM_SOURCE_DIR = os.path.join(dirname, "build/archives/sources")
+RPM_SOURCE_DIR = os.path.join(dirname, "build/archives/SOURCES")
 
 
 def archive_dir(package, *args):
@@ -268,7 +269,7 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
         )
         install.append(
             "cp -r {} %{{buildroot}}{}".format(
-                os.path.join("sources", source_name), source_dest
+                os.path.join("SOURCES", source_name), source_dest
             )
         )
         pre.append(
@@ -690,18 +691,6 @@ def add_partner_rpm_files(package, package_name):
         os.path.join(RELEASE_CONF_DIR, rpm_type.split('-')[0] +".ini")
     )
 
-    print("Building docker image {}...".format(release_conf["build"]["image"]))
-
-    try:
-        subprocess.run(["make", release_conf["build"]["image"]], cwd=dirname)
-    except subprocess.CalledProcessError:
-        print(
-            "Could not build docker image {}".format(
-                release_conf["build"]["image"]
-            )
-        )
-        sys.exit(1)
-
     print("Adding sources...")
     source_list = package.get("sources")
     if source_list:
@@ -750,18 +739,6 @@ def add_owner_rpm_files(package, package_name):
     release_conf.read(
         os.path.join(RELEASE_CONF_DIR, rpm_type.split('-')[0] +".ini")
     )
-
-    print("Building docker image {}...".format(release_conf["build"]["image"]))
-
-    try:
-        subprocess.run(["make", release_conf["build"]["image"]], cwd=dirname)
-    except subprocess.CalledProcessError:
-        print(
-            "Could not build docker image {}".format(
-                release_conf["build"]["image"]
-            )
-        )
-        sys.exit(1)
 
     print("Adding sources...")
     source_list = package.get("sources")
@@ -814,18 +791,6 @@ def add_native_rpm_files(package, package_name):
         os.path.join(RELEASE_CONF_DIR, rpm_type.split('_')[0] +".ini")
     )
 
-    print("Building docker image {}...".format(release_conf["build"]["image"]))
-
-    try:
-        subprocess.run(["make", release_conf["build"]["image"]], cwd=dirname)
-    except subprocess.CalledProcessError:
-        print(
-            "Could not build docker image {}".format(
-                release_conf["build"]["image"]
-            )
-        )
-        sys.exit(1)
-
     print("Adding sources...")
     source_list = package.get("sources")
     if source_list:
@@ -864,18 +829,6 @@ def add_pscript_rpm_files(package, package_name):
         os.path.join(RELEASE_CONF_DIR, package["name"] + ".ini")
     )
 
-    print("Building docker image {}...".format(release_conf["build"]["image"]))
-
-    try:
-        subprocess.run(["make", release_conf["build"]["image"]], cwd=dirname)
-    except subprocess.CalledProcessError:
-        print(
-            "Could not build docker image {}".format(
-                release_conf["build"]["image"]
-            )
-        )
-        sys.exit(1)
-
     print("Adding sources...")
     source_list = package.get("sources")
     if source_list:
@@ -896,18 +849,6 @@ def add_ownerpscript_rpm_files(package, package_name):
     release_conf.read(
         os.path.join(RELEASE_CONF_DIR, package["name"] + ".ini")
     )
-
-    print("Building docker image {}...".format(release_conf["build"]["image"]))
-
-    try:
-        subprocess.run(["make", release_conf["build"]["image"]], cwd=dirname)
-    except subprocess.CalledProcessError:
-        print(
-            "Could not build docker image {}".format(
-                release_conf["build"]["image"]
-            )
-        )
-        sys.exit(1)
 
     print("Adding sources...")
     source_list = package.get("sources")
@@ -930,18 +871,6 @@ def add_partnerpscript_rpm_files(package, package_name):
         os.path.join(RELEASE_CONF_DIR, package["name"] + ".ini")
     )
 
-    print("Building docker image {}...".format(release_conf["build"]["image"]))
-
-    try:
-        subprocess.run(["make", release_conf["build"]["image"]], cwd=dirname)
-    except subprocess.CalledProcessError:
-        print(
-            "Could not build docker image {}".format(
-                release_conf["build"]["image"]
-            )
-        )
-        sys.exit(1)
-
     print("Adding sources...")
     source_list = package.get("sources")
     if source_list:
@@ -963,18 +892,6 @@ def add_sandbox_inner_rpm_files(package, package_name):
     release_conf.read(
         os.path.join(RELEASE_CONF_DIR, rpm_type.split('-')[0] +".ini")
     )
-
-    print("Building docker image {}...".format(release_conf["build"]["image"]))
-
-    try:
-        subprocess.run(["make", release_conf["build"]["image"]], cwd=dirname)
-    except subprocess.CalledProcessError:
-        print(
-            "Could not build docker image {}".format(
-                release_conf["build"]["image"]
-            )
-        )
-        sys.exit(1)
 
     print("Adding inner rpms...")
     source_list = package.get("sources")
@@ -1041,7 +958,7 @@ for package in config["packages"]:
         [
             "tar",
             "-czf",
-            os.path.join("sources", "{}.tar.gz".format(package_name)),
+            os.path.join("SOURCES", "{}.tar.gz".format(package_name)),
             "{}".format(package_name),
         ],
         cwd=ARCHIVE_DIR,
@@ -1062,17 +979,15 @@ for package in config["packages"]:
         target = args.target
 
     command = [
-        "/usr/sbin/build_rpm.sh",
+        "./docker/build_rpm.sh",
         "--target",
         target,
         "--spec-file",
         spec_file,
-        "--source-dir",
-        release_conf["build"]["rpm_source_dir"],
+        "--source-dir", RPM_SOURCE_DIR,
         "--rpm-dir",
         release_conf["build"]["rpm_rpm_dir"],
-        "--output-dir",
-        release_conf["build"]["rpm_output_dir"],
+        "--output-dir", "RPMS",
         "--verbose",
     ]
 
@@ -1084,40 +999,7 @@ for package in config["packages"]:
 
     os.makedirs(RPM_DIR, exist_ok=True)
 
-    subprocess.run(
-        [
-            "docker",
-            "run",
-            "--rm",
-            "--name",
-            "appmgr_rpm_builder",
-            "-v",
-            "{}:{}".format(
-                os.path.abspath(SPEC_DIR),
-                release_conf["build"]["rpm_spec_dir"],
-            ),
-            "-v",
-            "{}:{}".format(
-                os.path.abspath(RPM_SOURCE_DIR),
-                release_conf["build"]["rpm_source_dir"],
-            ),
-            "-v",
-            "{}:{}".format(
-                os.path.abspath(RPM_DIR),
-                release_conf["build"]["rpm_output_dir"],
-            ),
-            # This one's for logs
-            "-v",
-            "{}:{}".format(
-                os.path.join(os.path.abspath(dirname), "build"), "/tmp"
-            ),
-            "-v",
-            "{}:{}".format(os.path.abspath(KEY_DIR), "/root/keys"),
-            release_conf["build"]["image"],
-        ]
-        + command,
-        cwd=RPM_SOURCE_DIR,
-    )
+    subprocess.run(command)
     print()
     print("Done building package", package["name"])
     print()

@@ -76,6 +76,7 @@ __EOF__
 fi
 
 /usr/bin/rpmbuild --verbose --target=${target} -bb ${spec_file} > ${log_file} 2>&1
+/usr/bin/rpmbuild --verbose --target=${target} --define "_topdir $PWD/build/archives/" -bb ${spec_file} > ${log_file} 2>&1
 rpm_build_ec=$?
 
 if [[ $rpm_build_ec -eq 0 ]]; then
