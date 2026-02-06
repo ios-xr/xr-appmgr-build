@@ -269,7 +269,7 @@ def make_partner_rpm_spec(package, pre, post, preun, install, files):
         )
         install.append(
             "cp -r {} %{{buildroot}}{}".format(
-                os.path.join("SOURCES", source_name), source_dest
+                os.path.join("sources", source_name), source_dest
             )
         )
         pre.append(
