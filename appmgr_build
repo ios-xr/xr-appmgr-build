@@ -979,7 +979,7 @@ for package in config["packages"]:
         target = args.target
 
     command = [
-        "./docker/build_rpm.sh",
+        "./build_rpm.sh",
         "--target",
         target,
         "--spec-file",
