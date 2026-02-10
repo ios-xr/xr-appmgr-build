@@ -75,7 +75,6 @@ __EOF__
     echo "GPG key specified. Attempting to import key"
 fi
 
-/usr/bin/rpmbuild --verbose --target=${target} -bb ${spec_file} > ${log_file} 2>&1
 /usr/bin/rpmbuild --verbose --target=${target} --define "_topdir $PWD/build/archives/" -bb ${spec_file} > ${log_file} 2>&1
 rpm_build_ec=$?
 
