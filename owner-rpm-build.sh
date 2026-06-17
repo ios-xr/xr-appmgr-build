@@ -142,7 +142,7 @@ cat > "${SPEC_FILE}" <<SPEC
 Name: ${RPM_NAME}
 Version: ${VERSION}
 Release: ${RELEASE}
-License: Proprietary
+License: BSD-3-Clause
 Packager: xr-appmgr-build
 SOURCE0 : ${FULL_NAME}.tar.gz
 Group: 3rd party application

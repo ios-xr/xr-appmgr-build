@@ -600,7 +600,7 @@ def make_spec(package):
         headers.append("Release: {}".format(package["release"]))
     # TODO: is this ok?
     headers.append(
-        "License: Copyright (c) 2024 Cisco Systems Inc. All rights reserved"
+        "License: BSD-3-Clause"
     )
     headers.append("Packager: cisco")
     headers.append("SOURCE0 : {}.tar.gz".format(package_name))
