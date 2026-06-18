@@ -95,7 +95,7 @@ Architecture: x86_64
 Install Date: (not installed)
 Group       : 3rd party application
 Size        : 102141046
-License     : BSD-3-Clause
+License     : Proprietary
 Signature   : (none)
 Source RPM  : owner-openr-1.0.1-r2.src.rpm
 Build Date  : Tue 17 Feb 2026 01:26:54 PM PST
