@@ -33,9 +33,9 @@ The preferred way to contribute is to fork the [main repository](https://github.
         $ git add modified_files
         $ git commit
 
-5. Push your changes to GitHub with:
+5. Push your changes to GitHub with (use the same branch name you created in step 3):
 
-        $ git push -u origin my-feature
+ $ git push -u origin feature/my-feature
 
 6. Finally, go to the web page of your fork of the `xr-appmgr-build` repo and click 'Pull Request' to send your changes for review.
 
