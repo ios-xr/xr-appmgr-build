@@ -598,7 +598,6 @@ def make_spec(package):
     else:
         package_name = "{name}-{version}".format(**package)
         headers.append("Release: {}".format(package["release"]))
-    # TODO: is this ok?
     headers.append(
         "License: Proprietary"
     )
