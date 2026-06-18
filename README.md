@@ -159,7 +159,7 @@ Architecture: x86_64
 Install Date: (not installed)
 Group       : 3rd party application
 Size        : 71
-License     : BSD-3-Clause
+License     : Proprietary
 Signature   : DSA/SHA1, Thu 19 Oct 2023 03:59:30 PM IST, Key ID fd7228c573f45f20
 Source RPM  : pscript-0.1.0-24.1.1.src.rpm
 Build Date  : Thu 19 Oct 2023 03:59:30 PM IST
@@ -222,7 +222,7 @@ Architecture: x86_64
 Install Date: (not installed)
 Group       : 3rd party application
 Size        : 71
-License     : BSD-3-Clause
+License     : Proprietary
 Signature   : DSA/SHA1, Mon 22 Jan 2024 06:28:24 PM IST, Key ID dc8ed574530b8c02
 Source RPM  : owner-pscript-0.1.0-24.1.1.src.rpm
 Build Date  : Mon 22 Jan 2024 06:28:24 PM IST
@@ -288,7 +288,7 @@ Architecture: x86_64
 Install Date: (not installed)
 Group       : 3rd party application
 Size        : 71
-License     : BSD-3-Clause
+License     : Proprietary
 Signature   : RSA/SHA256, Tue 05 Aug 2025 11:08:44 PM PDT, Key ID 747278115c06976b
 Source RPM  : partner-pscript-0.1.0-7.3.6.src.rpm
 Build Date  : Tue 05 Aug 2025 11:00:35 PM PDT
@@ -351,7 +351,7 @@ Architecture: x86_64
 Install Date: (not installed)
 Group       : 3rd party application
 Size        : 6485188
-License     : BSD-3-Clause
+License     : Proprietary
 Signature   : DSA/SHA1, Wed 14 May 2025 04:57:29 PM IST, Key ID a0fef849b98f0200
 Source RPM  : owner-alpine-3.14-7.10.1.src.rpm
 Build Date  : Wed 14 May 2025 04:57:29 PM IST

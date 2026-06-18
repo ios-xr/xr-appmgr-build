@@ -600,7 +600,7 @@ def make_spec(package):
         headers.append("Release: {}".format(package["release"]))
     # TODO: is this ok?
     headers.append(
-        "License: BSD-3-Clause"
+        "License: Proprietary"
     )
     headers.append("Packager: cisco")
     headers.append("SOURCE0 : {}.tar.gz".format(package_name))
